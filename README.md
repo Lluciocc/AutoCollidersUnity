@@ -24,7 +24,7 @@ Automatically generates simple colliders (Box, Sphere, or Capsule) for a 3D mode
 
 ## Folder Structure
 
-Assets/
+Assets/ <br>
 └── AutoColliders/ <br>
 ├── AutoColliderGenerator.cs <br>
 ├── AutoColliderGeneratorEditor.cs <br>
