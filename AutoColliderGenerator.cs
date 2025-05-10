@@ -1,11 +1,33 @@
 using UnityEngine;
+using System;
+using System.Collections.Generic;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+
+[System.Serializable]
+public class ColliderGenerationSettings
+{
+    public string tag = null;
+    public int layer = 0;
+    public bool isTrigger = false;
+    public PhysicMaterial material = null;
+}
 
 public class AutoColliderGenerator : MonoBehaviour
 {
     [HideInInspector] public bool showPreview = false;
+    public ColliderGenerationSettings settings = new ColliderGenerationSettings();
+
+#if UNITY_EDITOR
+    public List<MonoScript> additionalScripts = new List<MonoScript>();
+#endif
 
     public void GenerateColliders() => AddCollidersRecursively(transform);
     public void RemoveGeneratedColliders() => RemoveCollidersRecursively(transform);
+    public void RemoveMarkerColliders() => RemoveMarkerCollidersRecursively(transform);
 
     private void AddCollidersRecursively(Transform parent)
     {
@@ -45,7 +67,30 @@ public class AutoColliderGenerator : MonoBehaviour
                 }
 
                 if (newCollider != null)
+                {
+                    if (settings.tag != null)
+                        child.gameObject.tag = settings.tag;
+                    if (settings.layer != 0)
+                        child.gameObject.layer = settings.layer;
+
+                    newCollider.isTrigger = settings.isTrigger;
+                    newCollider.material = settings.material;
+
+#if UNITY_EDITOR
+                    foreach (var script in additionalScripts)
+                    {
+                        if (script == null) continue;
+                        var type = script.GetClass();
+                        if (type != null && child.GetComponent(type) == null)
+                        {
+                            child.gameObject.AddComponent(type);
+                        }
+                    }
+#endif
+
                     child.gameObject.AddComponent<GeneratedColliderMarker>();
+                }
+                    
             }
 
             AddCollidersRecursively(child);
@@ -62,11 +107,49 @@ public class AutoColliderGenerator : MonoBehaviour
                 var collider = child.GetComponent<Collider>();
                 if (collider != null) DestroyImmediate(collider);
                 DestroyImmediate(marker);
+            } 
+            else
+            {
+                Debug.LogWarning("AutoCollidersGenerator: It seems like there is no marker in this component. Did you remove it ?");
             }
 
             RemoveCollidersRecursively(child);
         }
     }
+
+    private void RemoveMarkerCollidersRecursively(Transform parent)
+    {
+        bool confirm = EditorUtility.DisplayDialog(
+            "Confirmation",
+            "Are you sure you want to remove all collider markers? You cannot undo!",
+            "Yes, do it",
+            "No"
+        );
+
+        if (confirm)
+        {
+            RemoveMarkers(parent); 
+        }
+        else
+        {
+            Debug.Log("Removal canceled.");
+        }
+    }
+
+    private void RemoveMarkers(Transform parent)
+    {
+        foreach (Transform child in parent)
+        {
+            var marker = child.GetComponent<GeneratedColliderMarker>();
+            if (marker != null)
+            {
+                DestroyImmediate(marker);
+            }
+
+            RemoveMarkers(child);
+        }
+    }
+
 
     private bool IsSphere(Vector3 size)
     {
@@ -151,7 +234,7 @@ public class AutoColliderGenerator : MonoBehaviour
                 radius = Mathf.Min(size.x, size.y) / 2f;
                 height = size.z;
                 break;
-            default: 
+            default:
                 up = Vector3.up;
                 radius = Mathf.Min(size.x, size.z) / 2f;
                 height = size.y;
