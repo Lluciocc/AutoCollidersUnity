@@ -45,3 +45,14 @@ MIT License — free to use and modify, with attribution.
 - Capsule detection is based on size ratio (e.g., one dimension significantly larger).
 - Sphere detection assumes roughly equal dimensions.
 - Previews are drawn using the Gizmos API when the GameObject is selected.
+
+## Images
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Lluciocc/AutoCollidersUnity/refs/heads/main/image.png" width="200" style="display:inline-block; margin-right: 10px;">
+  <img src="https://raw.githubusercontent.com/Lluciocc/AutoCollidersUnity/refs/heads/main/image2.png" width="400" style="display:inline-block;">
+</p>
+
+
+
+## Credits & Special Thanks
+Special thanks to Silly (yuikonnu442) for the demonstration image.
