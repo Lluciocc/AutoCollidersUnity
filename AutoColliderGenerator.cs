@@ -119,21 +119,7 @@ public class AutoColliderGenerator : MonoBehaviour
 
     private void RemoveMarkerCollidersRecursively(Transform parent)
     {
-        bool confirm = EditorUtility.DisplayDialog(
-            "Confirmation",
-            "Are you sure you want to remove all collider markers? You cannot undo!",
-            "Yes, do it",
-            "No"
-        );
-
-        if (confirm)
-        {
-            RemoveMarkers(parent); 
-        }
-        else
-        {
-            Debug.Log("Removal canceled.");
-        }
+        RemoveMarkers(parent);
     }
 
     private void RemoveMarkers(Transform parent)
