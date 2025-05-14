@@ -82,14 +82,26 @@ public class AutoColliderGeneratorEditor : Editor
             script.RemoveGeneratedColliders();
         }
 
-
         EditorGUILayout.Space(20);
 
         if (GUILayout.Button("Remove Marker Colliders (for build)"))
         {
             AutoColliderGenerator script = (AutoColliderGenerator)target;
             Undo.RegisterFullObjectHierarchyUndo(script.gameObject, "Remove Marker Colliders (for build)");
-            script.RemoveMarkerColliders();
+            if (EditorUtility.DisplayDialog
+                (
+                "Confirmation",
+                "Are you sure you want to remove all collider markers? You cannot undo!",
+                "Yes, do it",
+                "No"
+                ))
+            {
+                script.RemoveMarkerColliders();
+            }
+            else
+            {
+                Debug.Log("Removal canceled.");
+            }
         }
 
         serializedObject.ApplyModifiedProperties();
